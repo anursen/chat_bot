@@ -3,10 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
+    <title>My Precious Chat Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
 </head>
 <body>
-    <h1>Welcome to my Flask App</h1>
-    <p>This is a simple web page served by Flask.</p>
+    <div class="container">
+        <h1>Welcome to My Chat Bot</h1>
+        <h4>You can choose my response tone and also add your PDF files to limit my responses</h4>
+
+        <div class="chatbot">
+            <div class="form-group">
+                <label for="systemMessage">Choose a tone for responses:</label>
+                <select id="systemMessage">
+                    <option value="short">Short</option>
+                    <option value="professional">Professional</option>
+                    <option value="friendly">Friendly</option>
+                    <option value="descriptive">Descriptive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="llm_model">Choose a model for response:</label>
+                <select id="llm_model">
+                    <option value="ollama">LLAMA 3.1:8B(LOCAL)</option>
+                    <option value="gpt4">gpt-4o-mini</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="chatInput">Your message:</label>
+                <textarea id="chatInput" placeholder="Type your message..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="pdfFile">Upload a PDF:</label>
+                <input type="file" id="pdfFile" accept=".pdf">
+            </div>
+
+            <div class="form-group">
+                <button id="submitBtn" onclick="submitData()">Submit</button>
+            </div>
+
+            <!-- Message log area -->
+            <div id="messageLog" class="message-log">
+                <!-- Messages will be appended here -->
+            </div>
+        </div>
+    </div>
+<script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.12/marked.min.js"></script>
 </body>
 </html>
