@@ -2,6 +2,7 @@ def create_random_invoices(number):
     from fpdf import FPDF
     from faker import Faker
     import random
+    import os
 
     # Initialize Faker
     fake = Faker()
@@ -85,6 +86,14 @@ def create_random_invoices(number):
     for invoice in invoice_data:
         add_invoice_page(pdf, invoice)
 
+    # Define the path to the folder
+    folder_name = "uploads"
+    folder_path = os.path.join(os.getcwd(), folder_name)
+
+    # Check if the folder exists, if not, create it
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    
     # Output the PDF to a file
     pdf.output("uploads/invoices.pdf")
 
