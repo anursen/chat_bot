@@ -21,6 +21,9 @@ def submit():
         pdf_path = os.path.join("uploads", pdf_file.filename)
         pdf_file.save(pdf_path)
 
+    # Function about pdf talk will come here
+    #pdf_path
+
     chat_bot_response = generate_one_time_response(human_message=chat_message,
                                                    system_message=system_message
                                                    ,choosen = model
