@@ -1,1 +1,1 @@
-Hi this is my multi modal chat-bot with RAG
+Hi this is my multi model 

@@ -4,58 +4,56 @@ from sample_pdf_genarator import create_random_invoices
 from langchain_community.document_loaders import PyPDFLoader
 import ollama
 import chromadb
+#from logger import  logger
 
-create_random_invoices(50)
-model_name = 'mxbai-embed-large:latest'
+#create_random_invoices(50)
 
-def load_document(file_path):
-    '''This function loads pdf file and returns vector db'''
-    pass
+class Vector_Storage:
+    def __init__(self, model, path):
+        self.pages = [] # store pages of Pdfs
+        self.model = model
+        self.path = path
+        self.client = chromadb.Client()
+        self.collection = self.client.create_collection(name="docs")
 
+    async def load_data_pdf(self):
+        ''' load pdfs to the loader '''
+        loader = PyPDFLoader( file_path=self.path, extract_images=True )
+        async for page in loader.alazy_load():
+            self.pages.append(page)
+    # store each document in a vector embedding database
+    def add_to_table(self):
+        for i, d in enumerate(self.pages):
+            response = ollama.embeddings(model=self.model
+                                         ,prompt=d.page_content)
+            embedding = response["embedding"]
+            self.collection.add(
+                ids=[str(i)]
+                , embeddings=[embedding]
+                , metadatas=d.metadata
+                , documents=d.page_content
+            )
+
+    def query_data(self,query,returned_document_count):
+        human_question_response = ollama.embeddings(
+            prompt=query,
+            model=self.model
+        )
+
+        results = self.collection.query(
+            query_embeddings=[human_question_response["embedding"]],
+            n_results=returned_document_count
+        )
+
+        return results['documents']
+
+
+
+
+
+ollama_model_name = 'mxbai-embed-large:latest'
 file_path = 'uploads/invoices.pdf'
-loader = PyPDFLoader(
-    file_path = file_path
-    ,extract_images = True
-    )
+query = "What Steven Web bought from us"
 
-loader = PyPDFLoader(file_path)
-pages = []
-async for page in loader.alazy_load():
-    pages.append(page)
+a = Vector_Storage(model=ollama_model_name,path=file_path)
 
-
-client = chromadb.Client()
-collection = client.create_collection(name="docs")
-
-# store each document in a vector embedding database
-for i, d in enumerate(pages):
-  response = ollama.embeddings(model = model_name
-                              ,prompt = d.page_content)
-  embedding = response["embedding"]
-  collection.add(
-    ids=[str(i)]
-    ,embeddings=[embedding]
-    ,metadatas=d.metadata
-    ,documents=d.page_content
-  )
-
-
-22222222222222222
-
-# an example prompt
-prompt = "What Steven Web bought from us"
-
-# generate an embedding for the prompt and retrieve the most relevant doc
-response = ollama.embeddings(
-  prompt=prompt,
-  model=model_name
-)
-
-results = collection.query(
-  query_embeddings=[response["embedding"]],
-  n_results=10
-)
-
-data = results['documents'][0][0]
-data
-results

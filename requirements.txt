@@ -13,8 +13,6 @@ build==1.2.2
 cachetools==5.5.0
 certifi==2024.8.30
 charset-normalizer==3.3.2
-chroma-hnswlib==0.7.6
-chromadb==0.5.9
 click==8.1.7
 coloredlogs==15.0.1
 comm==0.2.2
@@ -127,7 +125,6 @@ typing-inspect==0.9.0
 typing_extensions==4.12.2
 urllib3==2.2.3
 uvicorn==0.30.6
-uvloop==0.20.0
 watchfiles==0.24.0
 wcwidth==0.2.13
 websocket-client==1.8.0
