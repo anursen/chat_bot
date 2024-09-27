@@ -1,6 +1,5 @@
 #documentation about that module
 #https://python.langchain.com/docs/how_to/document_loader_pdf/
-from sample_pdf_genarator import create_random_invoices
 from langchain_community.document_loaders import PyPDFLoader
 import ollama
 import chromadb
@@ -9,14 +8,13 @@ from logger import  logger
 
 
 
-class Vector_Storage:
+class Mpsdlr:
+    #Multi Page Single PDF Loader Retrieve
     def __init__(self, model):
         self.pages = [] # store pages of Pdfs
         self.model = model
         self.client = chromadb.Client()
         self.collection = self.client.create_collection(name="docs")
-        #self.client.delete_collection(name='docs1')
-        #self.collection = self.client.create_collection(name="docs1")
 
     async def load_data_pdf(self,path):
         loader = PyPDFLoader( file_path = path, extract_images=True )
@@ -50,21 +48,3 @@ class Vector_Storage:
         return results['documents']
 
 
-
-
-
-#Sample Usage
-#create_random_invoices(50)
-ollama_model_name = 'mxbai-embed-large:latest'
-file_path = 'uploads/invoices.pdf'
-query = "What Steven Web bought from us"
-
-
-b = Vector_Storage(model=ollama_model_name)
-
-# Load the PDF asynchronously
-asyncio.run(b.load_data_pdf(path=file_path))
-
-
-#Query  db
-b.query_data('Lake Davidmouth',5)
