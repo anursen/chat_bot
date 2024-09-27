@@ -4,23 +4,25 @@ from sample_pdf_genarator import create_random_invoices
 from langchain_community.document_loaders import PyPDFLoader
 import ollama
 import chromadb
-#from logger import  logger
+import asyncio
+from logger import  logger
 
-#create_random_invoices(50)
+
 
 class Vector_Storage:
-    def __init__(self, model, path):
+    def __init__(self, model):
         self.pages = [] # store pages of Pdfs
         self.model = model
-        self.path = path
         self.client = chromadb.Client()
         self.collection = self.client.create_collection(name="docs")
+        #self.client.delete_collection(name='docs1')
+        #self.collection = self.client.create_collection(name="docs1")
 
-    async def load_data_pdf(self):
-        ''' load pdfs to the loader '''
-        loader = PyPDFLoader( file_path=self.path, extract_images=True )
+    async def load_data_pdf(self,path):
+        loader = PyPDFLoader( file_path = path, extract_images=True )
         async for page in loader.alazy_load():
             self.pages.append(page)
+        self.add_to_table()
     # store each document in a vector embedding database
     def add_to_table(self):
         for i, d in enumerate(self.pages):
@@ -51,9 +53,18 @@ class Vector_Storage:
 
 
 
+#Sample Usage
+#create_random_invoices(50)
 ollama_model_name = 'mxbai-embed-large:latest'
 file_path = 'uploads/invoices.pdf'
 query = "What Steven Web bought from us"
 
-a = Vector_Storage(model=ollama_model_name,path=file_path)
 
+b = Vector_Storage(model=ollama_model_name)
+
+# Load the PDF asynchronously
+asyncio.run(b.load_data_pdf(path=file_path))
+
+
+#Query  db
+b.query_data('Lake Davidmouth',5)
