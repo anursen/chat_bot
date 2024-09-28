@@ -14,60 +14,47 @@ ollama_model_name = 'mxbai-embed-large:latest'
 file_path = 'uploads/invoices.pdf'
 query = "What Steven Web bought from us"
 
-b = Mpsdlr(model=ollama_model_name)
+import asyncio
+import nest_asyncio
+from multiple_page_single_pdf_loader_retriever import Mpsdlr
+question = 'Where does our customer Amy Macias live?'
+# Apply nest_asyncio to allow nested event loops
+nest_asyncio.apply()
 
-# Load the PDF asynchronously
-asyncio.run(b.load_data_pdf(path=file_path))
+async def main(question,number_of_results):
+    ollama_model_name = 'mxbai-embed-large:latest'
+    file_path = 'uploads/invoices.pdf'
+    vector_db = Mpsdlr(model=ollama_model_name)
+    await vector_db.load_data_pdf(path=file_path)
+    
+    # Add the query at the end
+    results = vector_db.query_data(question, number_of_results)
+    return results
 
-#Query  db
-b.query_data('Amy Macias',5)
-
-1111111111111111111111111111111111111111111111111111111
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
-
-
-model = ChatOpenAI(model="gpt-4o-mini")
-prompt = ChatPromptTemplate.from_template("tell me a joke about {topic}")
-prompt
-chain = prompt | model | StrOutputParser()
-
-chain.invoke({'topic':'base'})
-
-
-prompt_template = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant"),
-    ("user", "Tell me a joke about {topic}")
-])
-
-prompt_template.invoke({"topic": "cats"})
-
+# Directly await the main coroutine
+results = asyncio.run(main(question=question,number_of_results=30))
+print(results)
+results
 
 333333333333333333333333333333333333333333333333333333
 
-
-from langchain_community.chat_models import JinaChat
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
-SystemMessagePromptTemplate)
 from langchain_openai import ChatOpenAI
+from system_messages import system_message_rag,human_message_rag
+system_message_rag
+from langchain_core.prompts.chat import HumanMessagePromptTemplate,SystemMessagePromptTemplate,ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
 
-model = ChatOpenAI(model="gpt-4o-mini")
+model = ChatOpenAI(model= "gpt-4o-mini")
 
-import os
+system_message_prompt  = SystemMessagePromptTemplate.from_template(system_message_rag)
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_message_rag)
 
-print(os.environ['OPENAI_API_KEY'])
-messages = [
-    SystemMessage(
-        content="You are a helpful assistant that translates English to French."
-    ),
-    HumanMessage(
-        content="Translate this sentence from English to French. I love programming."
-    ),
-]
-chat = JinaChat(temperature=0)
+prompt = ChatPromptTemplate.from_messages(
+    [system_message_prompt, human_message_prompt]
+)
 
+chain = prompt | model 
 
-chat(messages)
+chain.invoke(input={'context':results,'question' : question})
+
