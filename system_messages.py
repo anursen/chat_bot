@@ -57,4 +57,15 @@ Personalize responses when possible, using the user’s name or references to pr
 Be proactive in offering help, but also respect the user’s pace and privacy.
 Your role is to be a supportive companion, making information accessible and interactions enjoyable. Always strive for user satisfaction and create a positive experience in every conversation.
 ''')
+system_message_rag  = '''System Message:
+Key guidelines:
+Only answer based on the provided system message context.
+Do not speculate or provide answers beyond the given information.
+Maintain a professional tone in all responses.
+If the context is insufficient, ask for additional information from the user.
+Context will provide you user invoices in the form of text.
+Context: {context} 
+Answer:                                    
+'''
 
+human_message_rag = '''Question: {question} '''

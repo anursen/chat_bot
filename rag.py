@@ -1,5 +1,3 @@
-from pydoc_data.topics import topics
-
 from sample_pdf_genarator import create_random_invoices
 from multiple_page_single_pdf_loader_retriever import Mpsdlr
 import asyncio
@@ -33,7 +31,7 @@ from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(model="gpt-4o-mini")
 prompt = ChatPromptTemplate.from_template("tell me a joke about {topic}")
-
+prompt
 chain = prompt | model | StrOutputParser()
 
 chain.invoke({'topic':'base'})
@@ -45,3 +43,31 @@ prompt_template = ChatPromptTemplate.from_messages([
 ])
 
 prompt_template.invoke({"topic": "cats"})
+
+
+333333333333333333333333333333333333333333333333333333
+
+
+from langchain_community.chat_models import JinaChat
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+SystemMessagePromptTemplate)
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(model="gpt-4o-mini")
+
+import os
+
+print(os.environ['OPENAI_API_KEY'])
+messages = [
+    SystemMessage(
+        content="You are a helpful assistant that translates English to French."
+    ),
+    HumanMessage(
+        content="Translate this sentence from English to French. I love programming."
+    ),
+]
+chat = JinaChat(temperature=0)
+
+
+chat(messages)
