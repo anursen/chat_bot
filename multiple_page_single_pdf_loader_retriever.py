@@ -45,6 +45,4 @@ class Mpsdlr:
             n_results=returned_document_count
         )
 
-        return results['documents']
-
-
+        return results
