@@ -64,7 +64,8 @@ Do not speculate or provide answers beyond the given information.
 Maintain a professional tone in all responses.
 If the context is insufficient, ask for additional information from the user.
 Context will provide you user invoices in the form of text.
-Context: {context} 
+Context: {context}
+Question ; {question} 
 Answer:                                    
 '''
 

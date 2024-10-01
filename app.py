@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from chat_bot import generate_one_time_response
 import os
 
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -24,12 +25,18 @@ def submit():
     # Function about pdf talk will come here
     #pdf_path
 
-    chat_bot_response = generate_one_time_response(human_message=chat_message,
-                                                   system_message=system_message
-                                                   ,choosen = model
-                                                   ,history=[])
+    if pdf_file:
+        print(pdf_path)
+        chat_bot_response = 'No response yet'
+
+    else:
+        chat_bot_response = generate_one_time_response(human_message=chat_message,
+                                                       system_message=system_message
+                                                       ,choosen = model
+                                                       ,history=[])
 
     return jsonify({'response': chat_bot_response})
+
 
 if __name__ == '__main__':
     # Create upload folder if it does not exist
