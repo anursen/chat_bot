@@ -5,11 +5,11 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
 
-file_path = ("layout-parser-paper.pdf")
+file_path = "layout-parser-paper.pdf"
 
 loader = PyPDFLoader(file_path)
 docs = loader.load()
-'''
+#'''
 whole_pages = []
 for i in range(len(docs)):
     whole_pages.append((docs[i].page_content))

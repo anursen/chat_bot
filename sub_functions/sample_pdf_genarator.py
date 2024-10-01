@@ -1,4 +1,4 @@
-def create_random_invoices(number):
+def sample_pdf_generator(number):
     from fpdf import FPDF
     from faker import Faker
     import random

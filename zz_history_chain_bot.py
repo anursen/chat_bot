@@ -1,6 +1,6 @@
 # https://python.langchain.com/docs/how_to/prompts_composition/
 # https://python.langchain.com/v0.2/docs/how_to/qa_chat_history_how_to/
-
+# This is the code that im working on based on the on zz_historyaware.py
 
 
 import bs4
@@ -97,6 +97,9 @@ conversational_rag_chain = RunnableWithMessageHistory(
     history_messages_key="chat_history",
     output_messages_key="answer",
 )
+
+
+model = ollama(model='llama3.2:1b')
 
 
 

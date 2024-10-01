@@ -1,25 +1,22 @@
-The purpose of this file is to assign basic resposibilities and design the future of app.
+The purpose of this file is to assign basic responsibilities and design the future of app.
 You can follow up the features, stories, tasks with indentations.
-
 
 Feature
     Story
         Task
 
+
+
+
 ************************ Start of the Features **************************
-Propmt_Factory
+Prompt_Factory
     Back_End
-        Write a function that gets user inputs and system messages and combines them
+        Write a function that gets user inputs and system messages and combines them as a Chat
 
 
-History of Chats
+History of Chats - User Specific Chat
     Front End
     Back End
-
-User Specific Chat
-    Front End
-    Back End
-
 Rag
     Pdf_Rag
     Sql_Rag
@@ -27,6 +24,8 @@ Rag
 Agent
     Gmail Agent
     Sms Agent
+
+Tool Development
 
 Model Overview
     Logger
@@ -38,3 +37,7 @@ Cost Tracking
 
 Deploy to Cloud
     .....
+
+
+    Chain = Prompt | LLM | Retriever | LLM | Outparser
+                                                Tool |
