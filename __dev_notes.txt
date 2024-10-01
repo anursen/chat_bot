@@ -1,0 +1,9 @@
+History of Chats
+    Backend
+
+###################################    
+v0.3
+https://python.langchain.com/docs/how_to/message_history/
+v0.2
+https://python.langchain.com/v0.2/docs/how_to/qa_chat_history_how_to/
+

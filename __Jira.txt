@@ -1,0 +1,40 @@
+The purpose of this file is to assign basic resposibilities and design the future of app.
+You can follow up the features, stories, tasks with indentations.
+
+
+Feature
+    Story
+        Task
+
+************************ Start of the Features **************************
+Propmt_Factory
+    Back_End
+        Write a function that gets user inputs and system messages and combines them
+
+
+History of Chats
+    Front End
+    Back End
+
+User Specific Chat
+    Front End
+    Back End
+
+Rag
+    Pdf_Rag
+    Sql_Rag
+
+Agent
+    Gmail Agent
+    Sms Agent
+
+Model Overview
+    Logger
+    Langsmith
+
+Cost Tracking
+    Langsmith
+    Optimization
+
+Deploy to Cloud
+    .....

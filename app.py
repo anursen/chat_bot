@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from chat_bot import generate_one_time_response
+from chatbot_regular import generate_one_time_response
 import os
 
 
