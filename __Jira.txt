@@ -21,6 +21,7 @@ Rag
     Pdf_Rag
     Sql_Rag
 
+
 Agent
     Gmail Agent
     Sms Agent
@@ -38,6 +39,3 @@ Cost Tracking
 Deploy to Cloud
     .....
 
-
-    Chain = Prompt | LLM | Retriever | LLM | Outparser
-                                                Tool |

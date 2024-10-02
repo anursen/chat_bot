@@ -36,3 +36,14 @@ Feel free to submit issues or pull requests. Please ensure you follow the code s
 
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+
+Release Notes####################
+
+**Added User_id functionality to the front end
+
+**User History is now being stored in-memory
+
+**Model and tone is disabled after first reponse
+
