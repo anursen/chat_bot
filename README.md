@@ -47,3 +47,5 @@ Release Notes####################
 
 **Model and tone is disabled after first reponse
 
+** Fixed developer name on the git
+
