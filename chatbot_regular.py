@@ -1,30 +1,56 @@
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import OllamaLLM
-from utils.logger import logger
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_ollama import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai.chat_models import ChatOpenAI
 
-def generate_one_time_response(human_message,system_message,choosen,history):
+from utils.logger import logger
+
+# Function to generate a response with user history
+def generate_one_time_response(human_message, system_message, chosen_model, user_id, user_storage):
     global model
 
-
-    #ollama
-    #gpt4
-    if choosen =='ollama':
+    # Choose the model based on user input
+    if chosen_model == 'ollama':
         model = OllamaLLM(model='llama3.1:8b')
-        logger.debug(f'choseen model {choosen}')
-    elif choosen == 'gpt4':
+    elif chosen_model == 'gpt4':
         model = ChatOpenAI(model="gpt-4o-mini")
-        logger.debug(f'choseen model {choosen}')
+    else:
+        logger.error(f"Invalid model choice: {chosen_model}")
+        return None
 
-    logger.critical(f"returning response for '{human_message}' for'{system_message}' tone")
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You're an assistant that gives answers in  {tone} tone. Respond in 20 words or fewer",
+            ),
+            MessagesPlaceholder(variable_name="history"),
+            ("human", "{input}"),
+        ]
+    )
+    runnable = prompt | model
 
-    #TODO We should handle system messages here as well 
+    def get_session_history(session_id: str) -> BaseChatMessageHistory:
+        if session_id not in user_storage:
+            user_storage[session_id] = ChatMessageHistory()
+        return user_storage[session_id]
 
-    response = model.invoke(human_message)
+    with_message_history = RunnableWithMessageHistory(
+        runnable,
+        get_session_history,
+        input_messages_key="input",
+        history_messages_key="history",
+    )
 
-    if choosen == 'ollama':
-        response_text = response
-    if choosen == 'gpt4':
-        response_text = response.content
-
-    return response_text
+    response = with_message_history.invoke(
+        input = {"tone": system_message, "input": human_message},
+        config={"configurable": {"session_id": user_id}},
+    )
+    return response

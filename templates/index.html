@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Precious Chat Bot</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
 </head>
 <body>
     <div class="container">
@@ -13,6 +12,11 @@
         <h4>You can choose my response tone and also add your PDF files to limit my responses</h4>
 
         <div class="chatbot">
+            <div class="form-group">
+                <label for="userID">Enter your User ID:</label>
+                <input type="text" id="userID" placeholder="User ID" value = "user_id1">
+            </div>
+
             <div class="form-group">
                 <label for="systemMessage">Choose a tone for responses:</label>
                 <select id="systemMessage">
@@ -22,6 +26,7 @@
                     <option value="descriptive">Descriptive</option>
                 </select>
             </div>
+
             <div class="form-group">
                 <label for="llm_model">Choose a model for response:</label>
                 <select id="llm_model">
@@ -40,10 +45,9 @@
                 <input type="file" id="pdfFile" accept=".pdf">
             </div>
 
-            <div class="form-group">
+             <div class="form-group">
                 <button id="submitBtn" onclick="submitData()">Submit</button>
             </div>
-
             <!-- Message log area -->
             <div id="messageLog" class="message-log">
                 <!-- Messages will be appended here -->

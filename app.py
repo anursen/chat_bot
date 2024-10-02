@@ -17,6 +17,7 @@ def submit():
     system_message = request.form.get('systemMessage')
     chat_message = request.form.get('chatMessage')
     model = request.form.get('llm_model')
+    user_id = request.form.get('userID')
     pdf_file = request.files.get('pdfFile')
 
 
@@ -28,22 +29,23 @@ def submit():
     # Function about pdf talk will come here
     #pdf_path
 
-    if pdf_file:
-        print(pdf_path)
+    if pdf_file: # Go and activate the rag routine
         chat_bot_response = chatbot_rag_qa_call(file_path=pdf_path
                             ,chosen_model=model
                             ,query=chat_message
-                            ,user_id='user_id_1'
+                            ,user_id=user_id
                             ,user_files=user_files
                             ,user_storage=user_storage)
         chat_bot_response = chat_bot_response.get('answer', "No answer could be generated.")
 
-    else:
+    else: # go and activate the regular chat routine
         chat_bot_response = generate_one_time_response(human_message=chat_message,
                                                        system_message=system_message
-                                                       ,choosen = model
-                                                       ,history=[])
-
+                                                       ,chosen_model = model
+                                                       ,user_id = user_id
+                                                       ,user_storage = user_storage)
+    print(user_storage.keys())
+    print(user_storage)
     return jsonify({'response': chat_bot_response})
 
 
@@ -51,5 +53,5 @@ if __name__ == '__main__':
     # Create upload folder if it does not exist
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
 
