@@ -1,15 +1,9 @@
-from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_openai.chat_models import ChatOpenAI
-
 from utils.logger import logger
 
 # Function to generate a response with user history
@@ -53,4 +47,7 @@ def generate_one_time_response(human_message, system_message, chosen_model, user
         input = {"tone": system_message, "input": human_message},
         config={"configurable": {"session_id": user_id}},
     )
+    print(response)
+    if chosen_model == 'gpt4':
+        response = response.content
     return response

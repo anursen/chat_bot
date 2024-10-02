@@ -1,3 +1,4 @@
+from Scripts.bottle import response
 from flask import Flask, render_template, request, jsonify
 from chatbot_regular import generate_one_time_response
 from chatbot_rag_qa import chatbot_rag_qa_call
@@ -26,9 +27,7 @@ def submit():
         pdf_path = os.path.join("uploads", pdf_file.filename)
         pdf_file.save(pdf_path)
 
-    # Function about pdf talk will come here
-    #pdf_path
-
+    #Rag Routine
     if pdf_file: # Go and activate the rag routine
         chat_bot_response = chatbot_rag_qa_call(file_path=pdf_path
                             ,chosen_model=model
@@ -37,16 +36,17 @@ def submit():
                             ,user_files=user_files
                             ,user_storage=user_storage)
         chat_bot_response = chat_bot_response.get('answer', "No answer could be generated.")
-
-    else: # go and activate the regular chat routine
+    #Regular ChatBot
+    else:
         chat_bot_response = generate_one_time_response(human_message=chat_message,
                                                        system_message=system_message
                                                        ,chosen_model = model
                                                        ,user_id = user_id
                                                        ,user_storage = user_storage)
-    print(user_storage.keys())
-    print(user_storage)
+
+    print(chat_bot_response)
     return jsonify({'response': chat_bot_response})
+
 
 
 if __name__ == '__main__':
