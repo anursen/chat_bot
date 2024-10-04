@@ -1,7 +1,7 @@
 
 import openai
-from langsmith.wrappers import wrap_openai
-from langsmith import traceable
+from langsmith_tracing.wrappers import wrap_openai
+from langsmith_tracing import traceable
 
 # Auto-trace LLM calls in-context
 client = wrap_openai(openai.Client())

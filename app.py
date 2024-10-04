@@ -53,5 +53,5 @@ if __name__ == '__main__':
     # Create upload folder if it does not exist
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
-    app.run(host='0.0.0.0',debug=True)
+    app.run(host='192.168.86.78',debug=True,port=5000)
 
