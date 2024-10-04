@@ -39,13 +39,17 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 
 
-Release Notes####################
-
-**Added User_id functionality to the front end
+## Release Notes
+*1*
+Added User_id functionality to the front end
 
 **User History is now being stored in-memory
 
 **Model and tone is disabled after first reponse
 
-** Fixed developer name on the git
+ Fixed developer name on the git
+
+*2*
+Added ability to upload multiple files for user. 
+Uploaded files are stored as a file in folder.
 

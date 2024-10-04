@@ -47,7 +47,8 @@ def generate_one_time_response(human_message, system_message, chosen_model, user
         input = {"tone": system_message, "input": human_message},
         config={"configurable": {"session_id": user_id}},
     )
-    print(response)
+    logger.debug(f"response from the chat bot{response}")
+    #print(response)
     if chosen_model == 'gpt4':
         response = response.content
     return response

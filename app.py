@@ -1,11 +1,11 @@
-from Scripts.bottle import response
 from flask import Flask, render_template, request, jsonify
 from chatbot_regular import generate_one_time_response
 from chatbot_rag_qa import chatbot_rag_qa_call
 import os
+import shutil
+from utils.files import save_files
 
 app = Flask(__name__)
-user_files   = {}
 user_storage = {}
 
 @app.route('/')
@@ -19,22 +19,20 @@ def submit():
     chat_message = request.form.get('chatMessage')
     model = request.form.get('llm_model')
     user_id = request.form.get('userID')
-    pdf_file = request.files.get('pdfFile')
-
+    #get the list of files
+    files = request.files.getlist('fileUpload')
 
     # Safeguard in case no file is uploaded
-    if pdf_file:
-        pdf_path = os.path.join("uploads", pdf_file.filename)
-        pdf_file.save(pdf_path)
+    if files:
+        save_files(user_id,files)
 
     #Rag Routine
-    if pdf_file: # Go and activate the rag routine
-        chat_bot_response = chatbot_rag_qa_call(file_path=pdf_path
-                            ,chosen_model=model
-                            ,query=chat_message
-                            ,user_id=user_id
-                            ,user_files=user_files
-                            ,user_storage=user_storage)
+    if files: # Go and activate the rag routine
+        chat_bot_response = chatbot_rag_qa_call(chosen_model=model
+                                                ,query=chat_message
+                                                ,system_message = system_message
+                                                ,user_id=user_id
+                                                ,user_storage=user_storage)
         chat_bot_response = chat_bot_response.get('answer', "No answer could be generated.")
     #Regular ChatBot
     else:
@@ -44,14 +42,13 @@ def submit():
                                                        ,user_id = user_id
                                                        ,user_storage = user_storage)
 
-    print(chat_bot_response)
+    #print(chat_bot_response)
     return jsonify({'response': chat_bot_response})
-
-
 
 if __name__ == '__main__':
     # Create upload folder if it does not exist
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
+    # If the 'uploads' folder exists, delete it and its contents
+    if os.path.exists('uploads'):
+        shutil.rmtree('uploads')
+    os.makedirs('uploads')
     app.run(host='192.168.86.78',debug=True,port=5000)
-
