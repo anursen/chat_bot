@@ -1,4 +1,3 @@
-from Scripts.bottle import response
 from flask import Flask, render_template, request, jsonify
 from chatbot_regular import generate_one_time_response
 from chatbot_rag_qa import chatbot_rag_qa_call
