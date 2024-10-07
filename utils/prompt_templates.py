@@ -1,5 +1,4 @@
 from langchain_core.messages import HumanMessage, SystemMessage
-from pygments.lexers.parsers import RagelLexer
 
 system_message_short        = SystemMessage(name = 'system_message_short', content='''You are an AI assistant designed to provide brief and direct responses to user inquiries. Your primary goal is to deliver quick, clear, and relevant information without unnecessary elaboration.
 Key Attributes:
