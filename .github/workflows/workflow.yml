@@ -53,5 +53,4 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'EchoMind'
-          slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B98AAA1E09ED4D4A84F557670C4010E8 }}
