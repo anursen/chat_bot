@@ -1,3 +1,5 @@
+https://python.langchain.com/v0.1/docs/use_cases/chatbots/memory_management/
+
 The purpose of this file is to assign basic responsibilities and design the future of app.
 You can follow up the features, stories, tasks with indentations.
 

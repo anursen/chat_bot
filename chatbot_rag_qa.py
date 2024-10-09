@@ -6,12 +6,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_ollama import OllamaLLM
 from utils.logger import logger
 import os
-import chromadb
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -19,11 +17,15 @@ from utils.logger import  logger
 from langchain_community.document_loaders import PyPDFLoader
 
 
+
 # Attach user file to the session based on user_id and document path
 def process_user_files(user_id: str):
     #To store multiple texts I created all_splits array
+    #For now this function only process pdf files
     all_splits = []
+    retriever = None
     user_folder = os.path.join('uploads', user_id)
+
     for file_name in os.listdir(user_folder):
         file_path = os.path.join(user_folder,file_name)
         if file_name.lower().endswith('.pdf'):
@@ -32,21 +34,26 @@ def process_user_files(user_id: str):
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             splits = text_splitter.split_documents(docs)
             all_splits.extend(splits)
-            vectorstore = Chroma.from_documents(documents=all_splits, embedding=OpenAIEmbeddings())
-            #TODO we should save the file to a local db to save on tokens
-            retriever = vectorstore.as_retriever()
+
+            if all_splits:
+                vectorstore = Chroma.from_documents(documents=all_splits, embedding=OpenAIEmbeddings())
+                #TODO we should save the vector storage itself to a local db to save on tokens
+                retriever = vectorstore.as_retriever()
+    if not retriever:
+        raise ValueError("No PDF files processed or no splits generated.")
+
     return retriever
 
 # Main function for performing the RAG-based Q&A with user session and documents
-def chatbot_rag_qa_call(chosen_model: str, query: str,system_message,
+def chatbot_rag_qa_call(chosen_model: str, human_message: str,system_message,
                    user_id: str, user_storage: dict):
     # Choose the model based on user input
     if chosen_model == 'ollama':
         model = OllamaLLM(model='llama3.1:8b')
-        logger.debug(f"model : {chosen_model}, query :{query},for user {user_id}")
+        logger.debug(f"model : {chosen_model}, query :{human_message},for user {user_id}")
     elif chosen_model == 'gpt4':
         model = ChatOpenAI(model="gpt-4o-mini")
-        logger.debug(f"model : {chosen_model}, query :{query},for user {user_id}")
+        logger.debug(f"model : {chosen_model}, query :{human_message},for user {user_id}")
     else:
         logger.error(f"Invalid model choice: {chosen_model}")
         return None
@@ -113,10 +120,10 @@ def chatbot_rag_qa_call(chosen_model: str, query: str,system_message,
 
     # Invoke the chain with user input and session configuration
     result = conversational_rag_chain.invoke(
-        {"input": query},  # Input query
+        {"input": human_message},  # Input query
         {"configurable": {"session_id": user_id}}  # Configuration with session ID
     )
 
     # Return the final answer
-    return result
-    #return result.get('answer', "No answer could be generated.")
+    #return result
+    return result.get('answer', "No answer could be generated.")
