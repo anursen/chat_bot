@@ -8,9 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <div class="right-column">
-            <h1>EchoMind ChatBot</h1>
-            <h4>Customize your responses and upload files for context</h4>
+
+
+        <h1>EchoMind ChatBot</h1>
+        <h4>Personalize Your Experience and Provide Context</h4>
 
             <div class="chatbot">
                 <div class="form-group">
@@ -61,10 +62,26 @@
                 </div>
 
                 <div id="messageLog" class="message-log"></div>
-            </div>
+            <h4>Developer Notes</h4>
+            <br>
+            <strong>User ID:</strong> Enter your User ID for a personalized chat experience tailored to your preferences.
+            <br>
+            <strong>Behavior:</strong> Select the type of chat bot you want:
+            <br>
+            <strong>Upload Files:</strong> Use this option to upload files that provide additional context for your inquiries.
+            <br>
+            <strong>Response Tone:</strong> Choose the tone of responses you'd like to receive (e.g., descriptive, concise, friendly).
+            <br>
+            <strong>Choose Model:</strong> Select between local models (like LLAMA 3.1:8B) or OpenAI models for your chat interactions.
+        </p>
+            <ul>
+                <li><strong>Regular Chat Bot:</strong> Engage in standard conversation.</li>
+                <li><strong>Q&A RAG Chat Bot:</strong> Get answers based on retrieval-augmented generation.</li>
+                <li><strong>Jarvis (Special QA RAG Bot for Home Assistant Data):</strong> A specialized question-and-answer retrieval-augmented generation bot that automatically integrates and utilizes data from your Home Assistant for seamless interaction.</li>
+            </ul>
         </div>
-
     <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.12/marked.min.js"></script>
+    <script> const chatHistory = {{ chat_history|tojson }}; </script>
 </body>
 </html>

@@ -15,4 +15,4 @@ def save_files(user_id, files):
         file_path = os.path.join(user_folder, secure_filename(file.filename))
         file.save(file_path)
         logger.critical(f"{file} saved{file_path}")
-        print('file saved')
+        #print('file saved')

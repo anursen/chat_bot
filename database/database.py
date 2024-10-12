@@ -146,8 +146,18 @@ class DatabaseChatMessageHistory(BaseChatMessageHistory):
         )
         self.db_session.add(db_message)
         self.db_session.commit()
+        #print('m#essage saved')
 
-    def get_messages(self) -> list[ChatMessage]:
+    def serialize_message(self,message):
+        """Convert a message to a dictionary for JSON serialization."""
+        return {
+            'sender': 'human' if isinstance(message, HumanMessage) else 'ai',
+            'content': message.content,
+            # Add any other fields you want to serialize
+        }
+
+    def get_messages(self, user_id, session_id) -> list[ChatMessage]:
+
         """
         Retrieves the chat history for the current session from the database.
 
@@ -156,13 +166,15 @@ class DatabaseChatMessageHistory(BaseChatMessageHistory):
         list[ChatMessage]
             A list of ChatMessage objects (HumanMessage or AIMessage) retrieved from the database.
         """
-        db_messages = self.db_session.query(ChatMessageDB).filter_by(session_id=self.user_id).all()
+        db_messages = self.db_session.query(ChatMessageDB).filter_by(user_id=user_id, session_id=session_id).all()
         chat_messages = []
         for db_message in db_messages:
-            if db_message.sender == "human":
-                chat_messages.append(HumanMessage(content=db_message.content))
+            if db_message.sender == "ai":
+                message = AIMessage(content=db_message.content)
             else:
-                chat_messages.append(AIMessage(content=db_message.content))
+                message = HumanMessage(content=db_message.content)
+            chat_messages.append(self.serialize_message(message))
+        #print('Messages retrieved:', chat_messages)  # Debugging output to see the retrieved messages
         return chat_messages
 
     def clear(self) -> None:

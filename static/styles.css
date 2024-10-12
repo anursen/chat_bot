@@ -8,7 +8,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
+    background: #f9f9f9;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     padding: 30px;
@@ -18,14 +18,35 @@ body {
 
 h1 {
     text-align: center;
-    color: #007bff;
-    margin-bottom: 10px;
+    color: #495057;
+    margin-bottom: 20px;
 }
 
 h4 {
     text-align: center;
-    color: #495057;
-    margin-bottom: 30px;
+    color: #495057; /* Text color */
+    margin-bottom: 30px; /* Space below the heading */
+    font-size: 1.5em; /* Increase font size */
+    font-weight: bold; /* Make the font bold */
+    padding: 10px; /* Add padding for spacing */
+    background-color: #f8f9fa; /* Light background color */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+strong {
+    color: #007bff; /* Bootstrap primary color for emphasis */
+}
+
+
+ul {
+    margin: 10px 0; /* Margin above and below the list */
+    padding-left: 20px; /* Indentation for the list */
+}
+
+li {
+    color: #495057; /* Dark color for list items */
+    margin-bottom: 5px; /* Spacing between list items */
 }
 
 .form-group {

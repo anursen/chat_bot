@@ -2,6 +2,9 @@ History of Chats
     Backend
 
 ###################################    
+Google styleguide for Python
+https://google.github.io/styleguide/pyguide.html
+
 v0.3
 https://python.langchain.com/docs/how_to/message_history/
 v0.2

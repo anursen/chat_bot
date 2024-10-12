@@ -1,3 +1,14 @@
+document.addEventListener("DOMContentLoaded", function() {
+    // Load and display chat history from the server
+    if (chatHistory.length > 0) {
+        chatHistory.forEach(function(message) {
+            const isUser = message.sender === 'human';  // Assume 'sender' is 'human' or 'ai'
+            console.log(message);
+            appendMessage(message.content, isUser);
+        });
+    }
+});
+
 function submitData() {
     const userID = document.getElementById("userID").value;
     const systemMessage = document.getElementById("systemMessage").value;
@@ -62,7 +73,7 @@ function appendMessage(message, isUser) {
     messageElement.textContent = message;
 
     // Append the new message to the message log
-    messageLog.appendChild(messageElement);
+    messageLog.prepend(messageElement);
 
     // Scroll to the top of the message log to show the latest message
     messageLog.scrollTop = messageLog.scrollHeight;
@@ -119,3 +130,14 @@ fileUploadInput.addEventListener('change', function(event) {
 
     checkSubmitButtonState(); // Check the state of the submit button
 });
+
+function getQueryParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+    }
+
+// Set the value of the input field from the URL parameter
+const userID = getQueryParameter('id');
+if (userID) {
+document.getElementById('userID').value = userID;
+}

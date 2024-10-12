@@ -41,7 +41,7 @@ def chatbot_regular(human_message, system_message, chosen_model, user_id, user_s
             user_storage[user_id] = ChatMessageHistory()
         return user_storage[user_id]
     #print(user_storage)
-    print(get_session_history(user_id))
+    #print(get_session_history(user_id))
 
     with_message_history = RunnableWithMessageHistory(
         runnable,

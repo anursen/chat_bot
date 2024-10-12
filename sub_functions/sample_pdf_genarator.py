@@ -97,4 +97,4 @@ def sample_pdf_generator(number):
     # Output the PDF to a file
     pdf.output("uploads/invoices.pdf")
 
-    print("PDF created successfully.")
+    #print("PDF created successfully.")
