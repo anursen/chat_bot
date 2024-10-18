@@ -1,21 +1,31 @@
-from typing import Literal, Optional
+from typing import Optional, Literal
 from langchain_core.tools import tool
 
 from job import Job
 from resume import Resume
 
 def process_job() -> Job:
-    ''' process job'''
+    """Process job data."""
     job = Job.mock()
     return job
 
-def process_resume() ->Resume:
-    ''' process resume'''
+def process_resume() -> Resume:
+    """Process resume data."""
     resume = Resume.mock()
     return resume
 
 @tool
-def get_job(field: Optional[Literal['title','company','location','salary','description', 'responsibilities']]):
-    '''get the job data '''
+def get_job(field: Optional[Literal['title', 'company', 'location', 'salary', 'description', 'responsibilities', 'benefits', 'employment_type', 'posted_date']] = None) -> str:
+    """Get job data."""
     job = process_job()
-    return getattr(job,field, None)
+    if field:
+        return getattr(job, field)
+    return job.dict()
+
+@tool
+def get_resume(field: Optional[Literal['name', 'professional_summary', 'work_experience', 'education', 'skills']] = None) -> str:
+    """Get resume data."""
+    resume = process_resume()
+    if field:
+        return getattr(resume, field)
+    return resume.dict()

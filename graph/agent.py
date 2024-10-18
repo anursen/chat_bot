@@ -9,21 +9,26 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
-from langchain_ollama import ChatOllama
+#from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
-from tools import process_job,process_resume
+from tools import get_job,get_resume
 
-process_job()
+#model = ChatOllama(model= 'llama2:7b-chat-q2_K')
+model = ChatOpenAI(model='gpt-4o-mini')
 
-model = ChatOllama(model= 'llama2:7b-chat-q2_K')
-
-tools = [process_job,process_resume]
+tools = [get_job,get_resume]
 
 model.bind_tools(tools)
 
 def expert(state: MessagesState):
     ''' Expert node function to use tools'''
-    system_message = ''' Here is the system message for chat agent'''
+    system_message = '''  You are a resume expert. You are tasked with improving the user resume based on a job description.
+        You can access the resume and job data using the provided tools.
+
+        You must NEVER provide information that the user does not have.
+        These include, skills or experiences that are not in the resume. Do not make things up.
+        '''
     messages = state['messages']
     response = model.invoke([system_message] + messages)
 
@@ -31,14 +36,12 @@ def expert(state: MessagesState):
 
 tool_node = ToolNode(tools)
 
-def should_continue(state: MessagesState) -> Literal['tools',END]:
-    '''Edge between tool and expert'''
+def should_continue(state: MessagesState) -> Literal["tools", END]:
     messages = state['messages']
+    print(messages)
     last_message = messages[-1]
-    
     if last_message.tool_calls:
-        return 'tools'
-    
+        return "tools"
     return END
 
 graph = StateGraph(MessagesState)
