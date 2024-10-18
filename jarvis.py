@@ -1,14 +1,9 @@
 import requests
-from langchain_core.tools import tool
 from langchain import hub
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import os
 from dotenv import load_dotenv
-from markdown_it.rules_inline import entity
-from pyasn1_modules.rfc2985 import friendlyName
-from sqlalchemy.util import counter
-
 from utils.logger import logger
 from langchain_ollama import OllamaLLM
 from langchain.prompts import ChatPromptTemplate
@@ -17,7 +12,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.docstore.document import Document
 import json
-
+from langchain_core.tools import tool
+from typing import List
 
 def jarvis(human_message,system_message,chosen_model,user_id,user_storage):
 
@@ -73,30 +69,31 @@ def jarvis(human_message,system_message,chosen_model,user_id,user_storage):
 
 
 
-
-def query_home_assistant(api_url: str, token: str) -> dict:
-    """Query Home Assistant API.
-
-    Args:
-        api_url: The API endpoint of Home Assistant.
-        token: The Bearer token for authorization.
+@tool
+def query_home_assistant() -> dict:
+    """Query Home Assistant API to get all the current states from all the sensors.
 
     Returns:
         The JSON response from the API.
     """
+
+    load_dotenv()
+    # Get the Home Assistant token
+    token = os.getenv('HA_TOKEN')
+    states_url = os.getenv('HA_STATES_URL')
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
-    response = requests.get(api_url, headers=headers)
+    response = requests.get(states_url, headers=headers)
     if response.status_code == 200:
         result = response.json()
         return result
     else:
         logger.critical(f"Api call failed to home asistant with {api_url}")
         pass
-
-def home_assistant_get_entities() -> dict:
+@tool
+def ha_get_entities() -> dict:
     """
     Connects to the Home Assistant API to retrieve information about entities in the home.
     The function queries the Home Assistant API to fetch the current state of all entities.
@@ -161,8 +158,8 @@ def home_assistant_get_entities() -> dict:
 
         # Return an empty dictionary in case of an API failure.
         return {}
-
-def home_assistant_get_state_of_a_specific_sensor(entity_id) -> dict:
+@tool
+def ha_get_state_of_a_specific_sensor(entity_id) -> dict:
     """
     Retrieves the current state of a specific sensor from the Home Assistant API.
 
@@ -203,46 +200,17 @@ def home_assistant_get_state_of_a_specific_sensor(entity_id) -> dict:
             f"API call failed to Home Assistant with URL: {api_url}, Status Code: {response.status_code}")
         return {}
 
-def home_assistant_get_all_the_entity_names_in_a_specific_class(class_name) -> dict:
+@tool
+def ha_get_all_the_entity_names_in_a_specific_class(class_name) -> dict:
     """
-    Retrieve all entity names and their friendly names for a specified entity class from Home Assistant.
+      Retrieve all entity names and their friendly names for a specified entity class from Home Assistant.
 
-    This function makes an API call to the Home Assistant server to fetch the current state of all entities
-    available in the system. It parses the API response and extracts entity IDs along with their metadata (friendly names)
-    and organizes them into a dictionary grouped by their entity type (class). The function filters and returns the
-    entity details for the specified class name.
+      Args:
+          class_name: The class name (e.g., 'person', 'sensor', 'light') for which the entities should be returned.
 
-    Args:
-        class_name (str): The class name (e.g., 'person', 'sensor', 'light') for which the entities should be returned.
-                          Each entity in Home Assistant is prefixed with the class type in the form of 'class_name.entity_id'.
-
-    Returns:
-        dict: A dictionary containing the entities of the specified class. The structure of the returned dictionary is as follows:
-              {
-                  'entity_id_1': {'friendly_name': 'Friendly Name 1'},
-                  'entity_id_2': {'friendly_name': 'Friendly Name 2'},
-                  ...
-              }
-              If the specified class is not found, an empty dictionary is returned.
-
-    Raises:
-        None: The function does not raise exceptions, but it logs a critical error if the API call fails.
-
-    Example:
-        If there are entities of type 'person' in Home Assistant, calling this function with class_name='person' may return:
-        {
-            'person.john_doe': {'friendly_name': 'John’s Phone'},
-            'person.jane_doe': {'friendly_name': 'Jane’s Phone'}
-        }
-        In case the class does not exist or the API request fails, it returns an empty dictionary.
-
-    Workflow:
-        1. Load the Home Assistant token from environment variables.
-        2. Define the required headers and make an API call to fetch all entity states.
-        3. Parse the response and group the entities by their entity type (class).
-        4. For the specified class_name, return a dictionary containing entity IDs and their friendly names.
-        5. Log a critical error if the specified class does not exist in the returned data or if the API call fails.
-    """
+      Returns:
+          dict: A dictionary containing the entities of the specified class.
+      """
     # Load environment variables (for HA_TOKEN)
     load_dotenv()
     token = os.getenv('HA_TOKEN')
@@ -284,14 +252,51 @@ def home_assistant_get_all_the_entity_names_in_a_specific_class(class_name) -> d
             logger.critical(f"API call failed to Home Assistant with URL: {api_url}, Status Code: {response.status_code}")
             return {}
 
-#tools = [home_assistant_get_entities,
-#home_assistant_get_state_of_a_specific_sensor,
-#home_assistant_get_all_the_entity_names_in_a_specific_class]
-#response = query_home_assistant()
-#tools = [home_assistant_get_state_of_a_specific_sensor]
+@tool
+def ha_get_all_the_entities_in_a_specific_class_short(class_name) -> List:
+    """
+      Retrieve all entity names for a specified entity class from Home Assistant.
 
+      Args:
+          class_name: The class name (e.g., 'person', 'sensor', 'light') for which the entities should be returned.
 
-#llm = ChatOpenAI()
-#llm_with_tools = llm.bind_tools(tools)
-#response = llm_with_tools.invoke('whats the temperature in my home?')
-#response.tool_calls
+      Returns:
+          list: A list containing the entities of the specified class.
+      """
+    # Load environment variables (for HA_TOKEN)
+    load_dotenv()
+    token = os.getenv('HA_TOKEN')
+
+    # Define headers for the API request
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
+    # API URL to retrieve all entity states from Home Assistant
+    api_url = "http://192.168.86.12:8123/api/states"
+
+    # Make a GET request to Home Assistant API
+    response = requests.get(api_url, headers=headers)
+
+    # Check if the response is successful
+    if response.status_code == 200:
+        # Parse the JSON response
+        entities = response.json()
+        # Initialize an empty dictionary to hold class-specific entities
+        results = []
+        entity_dict = {}
+        # Loop through the list of entities
+        for entity in entities:
+            entity_id = entity.get('entity_id')
+            entity_type = entity_id.split('.')[0]
+            if entity_type == class_name:
+                results.append(entity_id)
+
+        # Return the final list  containing the entities for the specified class
+        return results
+
+    else:
+        logger.critical(f"API call failed to Home Assistant with URL: {api_url}, Status Code: {response.status_code}")
+        return []
+

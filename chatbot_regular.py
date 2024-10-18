@@ -8,14 +8,18 @@ from langchain.schema import BaseChatMessageHistory, ChatMessage, HumanMessage, 
 from database.database import DatabaseChatMessageHistory
 
 def chatbot_regular(human_message, system_message, chosen_model, user_id, user_storage):
-    global model
+    #global model
 
-    def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    def get_session_history_from_db(session_id: str) -> BaseChatMessageHistory:
+        ''' You can filter the results that's is being retrieved from db by session id later
+        Now we are getting just by user_id'''
         return DatabaseChatMessageHistory(user_id= user_id,session_id='222')
 
     # Load session history from the database
-    message_history = get_session_history(user_id)
-    message_history.add_message(HumanMessage(content=human_message)
+    message_history_on_db = get_session_history_from_db(user_id)
+    #message_history_on_db = DatabaseChatMessageHistory(user_id='user_id1', session_id='222')
+    #message_history_on_db.get_messages('user_id1','222')
+    message_history_on_db.add_message(HumanMessage(content=human_message)
                                 ,tone=system_message
                                 ,message_type="human"                  # Indicate this is a human message
                                 )
@@ -35,6 +39,9 @@ def chatbot_regular(human_message, system_message, chosen_model, user_id, user_s
            ("human", "{input}"),
         ])
     runnable = prompt | model
+
+    #print(runnable.invoke(human_message))
+
 
     def get_session_history(user_id: str) -> BaseChatMessageHistory:
         if user_id not in user_storage:
@@ -60,7 +67,7 @@ def chatbot_regular(human_message, system_message, chosen_model, user_id, user_s
     #print(response)
     if chosen_model == 'gpt4':
         response = response.content
-    message_history.add_message(
+    message_history_on_db.add_message(
         AIMessage(content=response),  # Pass only the content to AIMessage
         tone=system_message,  # Pass tone separately to add_message
         intent=None,  # If you have an intent, pass it here
