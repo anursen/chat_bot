@@ -1,0 +1,26 @@
+'''nodes
+edges
+states
+
+
+node1 node2
+Start Simple_Edges
+Conditional_edges
+Bidrectional
+single directional
+
+End 
+
+STATES
+ DATA STRUCTURES (LİKE CONVERSATİON BETWEEN NODES)
+
+
+START 
+
+EXPERT
+TOOLS
+
+__END__
+
+'''
+
