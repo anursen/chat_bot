@@ -1,5 +1,6 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, field_validator
+
 
 class WorkExperience(BaseModel):
     job_title: str = Field(description="Job title or position.")

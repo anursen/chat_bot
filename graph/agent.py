@@ -1,17 +1,12 @@
-import os
-from dotenv import load_dotenv
-
 from typing import Annotated, Literal
 from typing_extensions import TypedDict
-
+from PIL import Image
 from langgraph.prebuilt import ToolNode
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.checkpoint.memory import MemorySaver
-
 #from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
-
 from tools import get_job,get_resume
 
 #model = ChatOllama(model= 'llama2:7b-chat-q2_K')
@@ -19,7 +14,7 @@ model = ChatOpenAI(model='gpt-4o-mini')
 
 tools = [get_job,get_resume]
 
-model.bind_tools(tools)
+model = model.bind_tools(tools)
 
 def expert(state: MessagesState):
     ''' Expert node function to use tools'''
@@ -38,11 +33,15 @@ tool_node = ToolNode(tools)
 
 def should_continue(state: MessagesState) -> Literal["tools", END]:
     messages = state['messages']
-    print(messages)
+    #print(messages)
     last_message = messages[-1]
+    #print('this is last message',last_message)
     if last_message.tool_calls:
+        print('tools returned')
         return "tools"
+    print('end returned')
     return END
+
 
 graph = StateGraph(MessagesState)
 
@@ -55,6 +54,16 @@ graph.add_edge('tools','expert')
 
 checkpointer = MemorySaver()
 app = graph.compile(checkpointer=checkpointer)
+
+from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
+
+# Save the image to a file
+with open("graph_output.png", "wb") as f:
+    f.write(
+        app.get_graph().draw_mermaid_png(
+            draw_method=MermaidDrawMethod.API,
+        )
+    )
 
 while True:
     user_input = input('>> ')
