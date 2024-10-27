@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 from chatbot_regular import chatbot_regular
 from chatbot_rag_qa import chatbot_rag_qa_call
-from jarvis import jarvis
+from jarvis.jarvis_with_memory import jarvis_with_memory
+
 import os
 import shutil
 from utils.files import save_files
 from database.database import DatabaseChatMessageHistory
+from langgraph.checkpoint.memory import MemorySaver
 
 app = Flask(__name__)
 user_storage = {}
-
 @app.route('/')
 def home():
     user_id = request.args.get('id')
@@ -49,14 +50,16 @@ def submit():
 
     chatbot_types = {'chatbot_regular':chatbot_regular
                      ,'chatbot_rag_qa': chatbot_rag_qa_call
-                     ,'jarvis':jarvis}
-
+                     ,'jarvis':jarvis_with_memory}
+    user_storage = {}
     attributes = ({'human_message'  : chat_message
                   ,'system_message' : system_message
                   ,'chosen_model'   : model
                   ,'user_id'        : user_id
                   ,'user_storage'   : user_storage})
-
+    #TODO Just for jarvis we are implementing memory level memory
+    if behaviour == 'jarvis':
+        user_storage = memory
     chat_bot_response = chatbot_types.get(behaviour,chatbot_regular)(**attributes)
     #print(1111,chat_bot_response)
 
@@ -68,4 +71,5 @@ if __name__ == '__main__':
     if os.path.exists('uploads'):
         shutil.rmtree('uploads')
     os.makedirs('uploads')
-    app.run(host='192.168.86.78',debug=True,port=5000)
+    memory = MemorySaver()
+    app.run(host='192.168.86.72',debug=True,port=5000)

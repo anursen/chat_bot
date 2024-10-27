@@ -1,72 +1,9 @@
 import requests
-from langchain import hub
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 import os
 from dotenv import load_dotenv
 from utils.logger import logger
-from langchain_ollama import OllamaLLM
-from langchain.prompts import ChatPromptTemplate
-from langchain_chroma import Chroma
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.docstore.document import Document
-import json
 from langchain_core.tools import tool
 from typing import List
-
-def jarvis(human_message,system_message,chosen_model,user_id,user_storage):
-
-    # Load environment variables from the .env file
-    load_dotenv()
-    # Get the Home Assistant token
-    token = os.getenv('HA_TOKEN')
-    states_url = os.getenv('HA_STATES_URL')
-    services_url = os.getenv('HA_SERVICES_URL')
-
-    if chosen_model == 'ollama':
-        model = OllamaLLM(model='llama3.1:8b')
-    elif chosen_model == 'gpt4':
-        model = ChatOpenAI(model="gpt-4o-mini")
-    else:
-        logger.error(f"Invalid model choice: {chosen_model}")
-
-    from langchain_core.documents import Document
-    #from langchain.docstore.document import Document
-    response = query_home_assistant(states_url, token)
-
-    processed_response = []
-    for i in response:
-        processed_response.append(json.dumps(i, separators=(',', ':')))
-
-    # Document object is made of  dictionary with two keys
-    # 'page_content'  : we will place the string here
-    # 'metadata'      : {'source':'local'}
-    # You can create a multiple "page" Document object by creating a list of Document objects
-    documents = []
-    for i in processed_response:
-        a = Document(page_content=i, metadata={})
-        documents.append(a)
-
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    splits = text_splitter.split_documents(documents)
-    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-    retriever = vectorstore.as_retriever()
-
-    prompt = hub.pull("rlm/rag-prompt")
-
-    def format_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
-
-    rag_chain = (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | model
-            | StrOutputParser()
-    )
-
-    return   rag_chain.invoke(human_message)
-
 
 
 @tool
@@ -90,7 +27,7 @@ def query_home_assistant() -> dict:
         result = response.json()
         return result
     else:
-        logger.critical(f"Api call failed to home asistant with {api_url}")
+        logger.critical(f"Api call failed to home asistant with")
         pass
 @tool
 def ha_get_entities() -> dict:
