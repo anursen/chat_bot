@@ -1,13 +1,25 @@
-from flask import Flask, render_template, request, jsonify
-from chatbot_regular import chatbot_regular
-from chatbot_rag_qa import chatbot_rag_qa_call
-from jarvis.jarvis_with_memory import jarvis_with_memory
-
 import os
 import shutil
-from utils.files import save_files
-from database.database import DatabaseChatMessageHistory
+import sqlite3
+from bot.modules.chatbot_regular import chatbot_regular
+from bot.modules.chatbot_rag_qa import chatbot_rag_qa_call
+from bot.modules.jarvis.jarvis_with_memory import jarvis_with_memory
+from bot.utils.files import save_files
+from bot.database import DatabaseChatMessageHistory
+from flask import Flask, render_template, request, jsonify
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+
+if not os.path.exists('state_db'):
+    os.makedirs('state_db')
+
+db_path = "state_db/example.db"
+conn = sqlite3.connect(db_path, check_same_thread=False)
+
+# Here is our checkpointer
+memory = SqliteSaver(conn)
+
 
 app = Flask(__name__)
 user_storage = {}
@@ -52,14 +64,15 @@ def submit():
                      ,'chatbot_rag_qa': chatbot_rag_qa_call
                      ,'jarvis':jarvis_with_memory}
     user_storage = {}
+    if behaviour == 'jarvis':
+        user_storage = memory
     attributes = ({'human_message'  : chat_message
                   ,'system_message' : system_message
                   ,'chosen_model'   : model
                   ,'user_id'        : user_id
                   ,'user_storage'   : user_storage})
     #TODO Just for jarvis we are implementing memory level memory
-    if behaviour == 'jarvis':
-        user_storage = memory
+  
     chat_bot_response = chatbot_types.get(behaviour,chatbot_regular)(**attributes)
     #print(1111,chat_bot_response)
 
@@ -71,5 +84,5 @@ if __name__ == '__main__':
     if os.path.exists('uploads'):
         shutil.rmtree('uploads')
     os.makedirs('uploads')
-    memory = MemorySaver()
-    app.run(host='192.168.86.72',debug=True,port=5000)
+    #memory = MemorySaver()
+    app.run(host='192.168.1.26',debug=True,port=5000)

@@ -14,6 +14,10 @@ import os
 import requests
 from datetime import datetime, timedelta
 import json
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utils.logger import logger
+
 
 def jarvis_with_memory(human_message:str,system_message,chosen_model,user_id,user_storage):
     print(user_storage)
@@ -26,7 +30,7 @@ def jarvis_with_memory(human_message:str,system_message,chosen_model,user_id,use
     else:
         llm = ChatOpenAI(model="gpt-4o-mini")
 
-    @tool
+    #@tool
     def ha_get_entities_containing(filter: str) -> list:
         """
         Retrieve all entity names from Home Assistant and filter the ones that contain the specified value.
@@ -266,8 +270,9 @@ def jarvis_with_memory(human_message:str,system_message,chosen_model,user_id,use
 
     # Node
     def assistant(state: MessagesState):
+       print('Asistant node run.')
        return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
-
+       
 
     # Graph
     builder = StateGraph(MessagesState)
@@ -285,20 +290,24 @@ def jarvis_with_memory(human_message:str,system_message,chosen_model,user_id,use
         tools_condition,
     )
     builder.add_edge("tools", "assistant")
-    react_graph = builder.compile()
-
-    # Show
-    #display(Image(react_graph.get_graph(xray=True).draw_mermaid_png()))
-
-    memory = MemorySaver()
 
     react_graph_memory = builder.compile(checkpointer=user_storage)
+
+    # Display the graph
+    #png_image = react_graph_memory.get_graph().draw_mermaid_png()
+    # Save the PNG to a file
+    #with open("jarvis_with_memory.png", "wb") as f:
+    #    f.write(png_image)
+
 
     # Specify a thread
     config = {"configurable": {"thread_id": user_id}}
 
     # Specify an input
     messages = [HumanMessage(content=human_message)]
+    print(messages)
+    print(react_graph_memory.get_state(config))
+
 
         # Run
     messages = react_graph_memory.invoke({"messages": messages},config)

@@ -3,9 +3,10 @@ from langchain_openai import ChatOpenAI
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from utils.logger import logger
 from langchain.schema import BaseChatMessageHistory, ChatMessage, HumanMessage, AIMessage
-from database.database import DatabaseChatMessageHistory
+
+from bot.database.database import DatabaseChatMessageHistory
+from bot.utils.logger import logger
 
 def chatbot_regular(human_message, system_message, chosen_model, user_id, user_storage):
     #global model

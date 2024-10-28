@@ -1,22 +1,24 @@
 from IPython.display import Image, display
 from langgraph.graph import StateGraph, START
-import sqlite3
-from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.graph import END
+import os
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage, RemoveMessage
+from langgraph.graph import MessagesState
+
 
 # In memory example
 #conn = sqlite3.connect(":memory:", check_same_thread = False)
+
+
+if not os.path.exists('state_db'):
+    os.makedirs('state_db')
 
 db_path = "state_db/example.db"
 conn = sqlite3.connect(db_path, check_same_thread=False)
 
 # Here is our checkpointer
 memory = SqliteSaver(conn)
-
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage, RemoveMessage
-
-from langgraph.graph import END
-from langgraph.graph import MessagesState
 
 model = ChatOpenAI(model="gpt-4o-mini",temperature=0)
 
@@ -103,7 +105,7 @@ png_image = graph.get_graph().draw_mermaid_png()
 # Display the image
 #display(Image(png_image))
 # Save the PNG to a file
-with open("graph_image.png", "wb") as f:
+with open("langgraph_db_with_memory.png", "wb") as f:
     f.write(png_image)
 
 # Create a thread
